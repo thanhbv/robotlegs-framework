@@ -1,5 +1,13 @@
 h2. Robotlegs Framework Changelog:
 
+h3. v1.4.1
+
+*Fixing SwiftSuspenders Mapping Warnings in the Context*
+Main injector mappings now unmapped when `set contextView` runs.
+Added protected 'unmapInjections' method.
+Updated to SS 1.6 (which has warnings on mapping-overwrite).
+Still works with SS 1.5.1
+
 h3. v1.4.0
 
 *ViewMap & MediatorMap*

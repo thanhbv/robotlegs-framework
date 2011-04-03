@@ -176,6 +176,7 @@ package org.robotlegs.mvcs
 				_commandMap = null;
 				_mediatorMap = null;
 				_viewMap = null;
+				unmapInjections();
 				mapInjections();
 				checkAutoStartup();
 			}
@@ -286,6 +287,35 @@ package org.robotlegs.mvcs
 			injector.mapValue(IMediatorMap, mediatorMap);
 			injector.mapValue(IViewMap, viewMap);
 			injector.mapClass(IEventMap, EventMap);
+		}
+		
+		/* 
+		Temporary injection unmapping fix for FLEX - where contextView is set
+		as a property and not through constructor, and the SS Injector is producing
+		mapping-overwrite warnings - Stray, 3 April 2011
+		*/
+		/**
+		 * Injection Unmapping Hook
+		 *
+		 * <p>Override this in your Framework context to change the default configuration.
+		 * It should be symmetrical with mapInjections.</p> 
+		 * <p>Only necessary if you are using Flex and setting your contextView
+		 * as a property rather than through the constructor.</p> 
+		 * <p>You may see SwiftSuspenders mapping-overwrite warnings where these
+		 * two methods are not symmetrical.</p> 
+		 * 
+		 * <p>Beware of collisions in your container</p>
+		 */
+		protected function unmapInjections():void
+		{
+			injector.unmap(IReflector);
+			injector.unmap(IInjector);
+			injector.unmap(IEventDispatcher);
+			injector.unmap(DisplayObjectContainer);
+			injector.unmap(ICommandMap);
+			injector.unmap(IMediatorMap);
+			injector.unmap(IViewMap);
+			injector.unmap(IEventMap);
 		}
 		
 		//---------------------------------------------------------------------

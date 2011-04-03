@@ -13,7 +13,9 @@ package org.robotlegs.mvcs.support
 	
 	public class TestContext extends Context
 	{
-		public var startupComplete:Boolean = false;
+		public var startupComplete:Boolean = false; 
+		
+		public var injectionsUnmappedCount:uint = 0;
 		
 		public function TestContext(contextView:DisplayObjectContainer = null, autoStartup:Boolean = true)
 		{
@@ -37,7 +39,12 @@ package org.robotlegs.mvcs.support
 			initialized = commandMap && initialized;
 			initialized = mediatorMap && initialized;
 			return initialized;
+		}
 		
+		override protected function unmapInjections():void
+		{
+			injectionsUnmappedCount++;
+			super.unmapInjections();
 		}
 	}
 }

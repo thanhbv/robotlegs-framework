@@ -132,5 +132,16 @@ package org.robotlegs.mvcs
 			context = new TestContext(contextView);
 			Assert.assertTrue("Context should be initialized", context.isInitialized);
 		}
+		
+		[Test]
+		public function settingContextViewCleansMappingsBeforeRewriting():void
+		{
+			context = new TestContext();
+			contextView = new TestContextView();
+			context.contextView = contextView;
+			Assert.assertEquals("unmap injections was run once", 1, context.injectionsUnmappedCount);
+			// turn on tracing for this test to be useful
+			Assert.assertTrue("Warnings not seen from SwiftSuspenders", true);
+		}
 	}
 }
