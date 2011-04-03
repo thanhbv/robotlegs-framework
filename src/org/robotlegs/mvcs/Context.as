@@ -29,39 +29,6 @@ package org.robotlegs.mvcs
 	import org.robotlegs.core.IViewMap;
 	
 	/**
-	 * Dispatched by the <code>startup()</code> method when it finishes
-	 * executing.
-	 * 
-	 * <p>One common pattern for application startup/bootstrapping makes use
-	 * of the <code>startupComplete</code> event. In this pattern, you do the
-	 * following:</p>
-	 * <ul>
-	 *   <li>Override the <code>startup()</code> method in your Context 
-	 *       subclass and set up application mappings in your 
-	 *       <code>startup()</code> override as you always do in Robotlegs.</li>
-	 *   <li>Create commands that perform startup/bootstrapping operations
-	 *       such as loading the initial data, checking for application updates,
-	 *       etc.</li>
-	 *   <li><p>Map those commands to the <code>ContextEvent.STARTUP_COMPLETE</code>
-	 *       event:</p>
-	 *       <listing>commandMap.mapEvent(ContextEvent.STARTUP_COMPLETE, LoadInitialDataCommand, ContextEvent, true):</listing>
-	 *       </li>
-	 *   <li>Dispatch the <code>startupComplete</code> (<code>ContextEvent.STARTUP_COMPLETE</code>)
-	 *       event from your <code>startup()</code> override. You can do this
-	 *       in one of two ways: dispatch the event yourself, or call 
-	 *       <code>super.startup()</code>. (The Context class's 
-	 *       <code>startup()</code> method dispatches the 
-	 *       <code>startupComplete</code> event.)</li>
-	 * </ul>
-	 * 
-	 * @eventType org.robotlegs.base.ContextEvent.STARTUP_COMPLETE
-	 * 
-	 * @see #startup()
-	 */
-	[Event(name="startupComplete", type="org.robotlegs.base.ContextEvent")]
-	
-	
-	/**
 	 * Abstract MVCS <code>IContext</code> implementation
 	 */
 	public class Context extends ContextBase implements IContext
@@ -131,14 +98,6 @@ package org.robotlegs.mvcs
 		 * The Startup Hook
 		 *
 		 * <p>Override this in your Application context</p>
-		 * 
-		 * @event startupComplete ContextEvent.STARTUP_COMPLETE Dispatched at the end of the
-		 *                        <code>startup()</code> method's execution. This
-		 *                        is often used to trigger startup/bootstrapping
-		 *                        commands by wiring them to this event and 
-		 *                        calling <code>super.startup()</code> in the 
-		 *                        last line of your <code>startup()</code>
-		 *                        override.
 		 */
 		public function startup():void
 		{
@@ -176,6 +135,7 @@ package org.robotlegs.mvcs
 				_commandMap = null;
 				_mediatorMap = null;
 				_viewMap = null;
+				unmapInjections();
 				mapInjections();
 				checkAutoStartup();
 			}
@@ -286,6 +246,35 @@ package org.robotlegs.mvcs
 			injector.mapValue(IMediatorMap, mediatorMap);
 			injector.mapValue(IViewMap, viewMap);
 			injector.mapClass(IEventMap, EventMap);
+		}
+		
+		/* 
+		Temporary injection unmapping fix for FLEX - where contextView is set
+		as a property and not through constructor, and the SS Injector is producing
+		mapping-overwrite warnings - Stray, 3 April 2011
+		*/
+		/**
+		 * Injection Unmapping Hook
+		 *
+		 * <p>Override this in your Framework context to change the default configuration.
+		 * It should be symmetrical with mapInjections.</p> 
+		 * <p>Only necessary if you are using Flex and setting your contextView
+		 * as a property rather than through the constructor.</p> 
+		 * <p>You may see SwiftSuspenders mapping-overwrite warnings where these
+		 * two methods are not symmetrical.</p> 
+		 * 
+		 * <p>Beware of collisions in your container</p>
+		 */
+		protected function unmapInjections():void
+		{
+			injector.unmap(IReflector);
+			injector.unmap(IInjector);
+			injector.unmap(IEventDispatcher);
+			injector.unmap(DisplayObjectContainer);
+			injector.unmap(ICommandMap);
+			injector.unmap(IMediatorMap);
+			injector.unmap(IViewMap);
+			injector.unmap(IEventMap);
 		}
 		
 		//---------------------------------------------------------------------
