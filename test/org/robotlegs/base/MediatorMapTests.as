@@ -76,6 +76,7 @@ package org.robotlegs.base
 			UIImpersonator.removeAllChildren();
 			injector.unmap(IMediatorMap);
 		}
+		      
 		
 		[Test]
 		public function mediatorIsMappedAndCreatedForView():void
@@ -229,13 +230,16 @@ package org.robotlegs.base
 			Assert.assertFalse("Mediator should not exist", mediatorMap.hasMediator(mediator));
 			Assert.assertFalse("View Mediator should not exist", mediatorMap.hasMediatorForView(viewComponent));
 		}
+		     
 		
 		private function delayFurther(event:Event, data:Object):void
 		{
 			Async.handleEvent(this, data.dispatcher, Event.ENTER_FRAME, data.method, 500, data);
 			delete data.dispatcher;
 			delete data.method;
-		}
+		} 
+		
+		
 		
 		[Test]
 		public function contextViewMediatorIsCreatedWhenMapped():void
@@ -278,6 +282,63 @@ package org.robotlegs.base
 			mediatorMap.mapView(ViewComponent, ViewMediator, null, true, true);
 			contextView.addChild(viewComponent);
 			Assert.assertTrue('Mediator should have been created for View Component', mediatorMap.hasMediatorForView(viewComponent));
+		}  
+		/*
+		
+		[Test(async, timeout='1200')]
+		public function mediatorIsMappedAndUnmappedInInjectorConsistentlyForMultipleViews():void
+		{
+			mediatorMap.mapView(ViewComponent, ViewMediator, null, false, true);
+			var viewComponent:ViewComponent = new ViewComponent();
+			var viewComponent2:ViewComponent = new ViewComponent();
+			contextView.addChild(viewComponent);
+			contextView.addChild(viewComponent2);
+			var mediator:IMediator = mediatorMap.createMediator(viewComponent);
+			var mediator2:IMediator = mediatorMap.createMediator(viewComponent2);
+            
+			Assert.assertTrue('Mediator mapping should have been created on the injector', injector.hasMapping(ViewMediator));
+
+			contextView.removeChild(viewComponent);                                                                   
+			Async.handleEvent(this, contextView, Event.ENTER_FRAME, delayFurther, 500, {dispatcher: contextView, method: verifyMediatorPersistsInInjector, view: viewComponent, view2: viewComponent2});
 		}
+		
+		private function verifyMediatorPersistsInInjector(event:Event, data:Object):void
+		{
+			trace("MediatorMapTests::verifyMediatorPersistsInInjector()");
+			var viewComponent:ViewComponent = data.view;
+			var viewComponent2:ViewComponent = data.view2;
+			
+			Assert.assertTrue('Mediator mapping should persist on the injector', injector.hasMapping(ViewMediator));
+			contextView.removeChild(viewComponent2);                                                                   
+
+			Async.handleEvent(this, contextView, Event.ENTER_FRAME, delayFurther, 500, {dispatcher: contextView, method: verifyMediatorRemovedFromInjector});
+		}
+		
+		private function verifyMediatorRemovedFromInjector(event:Event, data:Object):void
+		{
+			trace("MediatorMapTests::verifyMediatorRemovedFromInjector()");
+			Assert.assertFalse('Mediator mapping should no longer persist on the injector', injector.hasMapping(ViewMediator));
+		}
+		
+		
+		[Test]
+		public function mediatorIsMappedAndCreatedForMultipleViewsWithoutWarnings():void
+		{
+			mediatorMap.mapView(ViewComponent, ViewMediator, null, false, false);
+			var viewComponent:ViewComponent = new ViewComponent();
+			var viewComponent2:ViewComponent = new ViewComponent();
+			contextView.addChild(viewComponent);
+			contextView.addChild(viewComponent2);
+			var mediator:IMediator = mediatorMap.createMediator(viewComponent);
+			var mediator2:IMediator = mediatorMap.createMediator(viewComponent2);
+
+			injector.hasMapping(ViewMediator);
+			Assert.assertNotNull('Mediator should have been created ', mediator);
+			Assert.assertTrue('Mediator should have been created for View Component', mediatorMap.hasMediatorForView(viewComponent));
+			Assert.assertTrue('Mediator should have been created for second View Component', mediatorMap.hasMediatorForView(viewComponent2));    
+			// unfortunately this is a manual test
+			Assert.assertTrue('No warnings seen from the injector', false);
+		}    
+		*/
 	}
 }

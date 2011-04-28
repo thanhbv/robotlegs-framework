@@ -163,7 +163,6 @@ package org.robotlegs.base
 		 */
 		public function registerMediator(viewComponent:Object, mediator:IMediator):void
 		{
-			injector.mapValue(reflector.getClass(mediator), mediator);
 			mediatorByView[viewComponent] = mediator;
 			mappingConfigByView[viewComponent] = mappingConfigByViewClassName[getQualifiedClassName(viewComponent)];
 			mediator.setViewComponent(viewComponent);
@@ -182,7 +181,6 @@ package org.robotlegs.base
 				delete mappingConfigByView[viewComponent];
 				mediator.preRemove();
 				mediator.setViewComponent(null);
-				injector.unmap(reflector.getClass(mediator));
 			}
 			return mediator;
 		}
