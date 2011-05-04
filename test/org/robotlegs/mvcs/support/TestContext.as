@@ -10,6 +10,7 @@ package org.robotlegs.mvcs.support
 	
 	import org.robotlegs.core.IInjector;
 	import org.robotlegs.mvcs.Context;
+	import org.robotlegs.core.ICommandMap;
 	
 	public class TestContext extends Context
 	{
@@ -45,6 +46,11 @@ package org.robotlegs.mvcs.support
 		{
 			injectionsUnmappedCount++;
 			super.unmapInjections();
-		}
+		} 
+		  
+		public function getCommandMap():ICommandMap
+		{
+			return commandMap;
+		}                           
 	}
 }

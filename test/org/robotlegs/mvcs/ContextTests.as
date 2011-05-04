@@ -17,6 +17,8 @@ package org.robotlegs.mvcs
 	import org.robotlegs.base.ContextEvent;
 	import org.robotlegs.mvcs.support.TestContext;
 	import org.robotlegs.mvcs.support.TestContextView;
+	import org.robotlegs.core.ICommandMap;
+	import org.robotlegs.mvcs.support.ContextViewDependentCommand;
 	
 	public class ContextTests
 	{
@@ -142,6 +144,24 @@ package org.robotlegs.mvcs
 			Assert.assertEquals("unmap injections was run once", 1, context.injectionsUnmappedCount);
 			// turn on tracing for this test to be useful
 			Assert.assertTrue("Warnings not seen from SwiftSuspenders", true);
+		}   
+		
+		[Test]
+		public function noErrorsIfStartupRunsManuallyWhenContextViewIsntSet():void
+		{
+			context = new TestContext();
+			context.startup();
+			Assert.assertTrue("Context should now be started", context.startupComplete);
+		} 
+		
+		[Test]
+		public function executingACommandIsOkWhenNoContextView():void
+		{
+			context = new TestContext();
+			context.startup();
+			var commandMap:ICommandMap = context.getCommandMap();
+			commandMap.execute(ContextViewDependentCommand);
+			Assert.assertTrue('command ran without error', true);
 		}
 	}
 }
