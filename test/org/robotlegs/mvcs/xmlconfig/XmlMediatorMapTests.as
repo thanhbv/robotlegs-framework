@@ -35,6 +35,9 @@ package org.robotlegs.mvcs.xmlconfig
 					<field name='view'/>
 					<field name='viewAdvanced'/>
 				</type>
+				<type name='org.robotlegs.mvcs.support::NonViewMediator'>
+					<field name='nonView'/>
+				</type>
 			</types>;
 		
 		[Before(ui)]

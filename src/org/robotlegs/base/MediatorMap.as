@@ -98,7 +98,7 @@ package org.robotlegs.base
 			if (mappingConfigByViewClassName[viewClassName] != null)
 				throw new ContextError(ContextError.E_MEDIATORMAP_OVR + ' - ' + mediatorClass);
 			
-			if (reflector.classExtendsOrImplements(mediatorClass, IMediator) == false)
+			if (!reflector.classExtendsOrImplements(mediatorClass, IMediator))
 				throw new ContextError(ContextError.E_MEDIATORMAP_NOIMPL + ' - ' + mediatorClass);
 			
 			var config:MappingConfig = new MappingConfig();
@@ -174,6 +174,7 @@ package org.robotlegs.base
 		 */
 		public function removeMediator(mediator:IMediator):IMediator
 		{
+//			trace("MediatorMap.removeMediator", mediator);
 			if (mediator)
 			{
 				var viewComponent:Object = mediator.getViewComponent();
@@ -242,6 +243,9 @@ package org.robotlegs.base
 			{
 				contextView.addEventListener(Event.ADDED_TO_STAGE, onViewAdded, useCapture, 0, true);
 				contextView.addEventListener(Event.REMOVED_FROM_STAGE, onViewRemoved, useCapture, 0, true);
+				/*because useCapture == true && when use capture, REMOVED_FROM_STAGE is not trigger if target
+				 * is the contextView itself!*/
+				contextView.addEventListener(Event.REMOVED_FROM_STAGE, onViewRemoved);
 			}
 		}
 		
@@ -254,6 +258,7 @@ package org.robotlegs.base
 			{
 				contextView.removeEventListener(Event.ADDED_TO_STAGE, onViewAdded, useCapture);
 				contextView.removeEventListener(Event.REMOVED_FROM_STAGE, onViewRemoved, useCapture);
+				contextView.removeEventListener(Event.REMOVED_FROM_STAGE, onViewRemoved);
 			}
 		}
 		
@@ -264,13 +269,16 @@ package org.robotlegs.base
 		{
 			if (mediatorsMarkedForRemoval[e.target])
 			{
+//				trace("MediatorMap.onViewAdded but mediatorsMarkedForRemoval!", e.target);
 				delete mediatorsMarkedForRemoval[e.target];
 				return;
 			}
 			var viewClassName:String = getQualifiedClassName(e.target);
 			var config:MappingConfig = mappingConfigByViewClassName[viewClassName];
-			if (config && config.autoCreate)
+			if (config && config.autoCreate){
+//				trace("MediatorMap.onViewAdded && autoCreate", e.target);
 				createMediatorUsing(e.target, viewClassName, config);
+			}
 		}
 		
 		/**
@@ -306,8 +314,12 @@ package org.robotlegs.base
 		protected function onViewRemoved(e:Event):void
 		{
 			var config:MappingConfig = mappingConfigByView[e.target];
+//			if(e.target.toString() == "[object BoardView]"){
+//				trace("MediatorMap.onViewRemoved BoardView!!! ", config, config && config.autoRemove);
+//			}
 			if (config && config.autoRemove)
 			{
+//				trace("MediatorMap.onViewRemoved", e.target, hasMediatorsMarkedForRemoval);
 				mediatorsMarkedForRemoval[e.target] = e.target;
 				if (!hasMediatorsMarkedForRemoval)
 				{
@@ -322,9 +334,11 @@ package org.robotlegs.base
 		 */
 		protected function removeMediatorLater(event:Event):void
 		{
+//			trace("MediatorMap.removeMediatorLater:");
 			enterFrameDispatcher.removeEventListener(Event.ENTER_FRAME, removeMediatorLater);
 			for each (var view:DisplayObject in mediatorsMarkedForRemoval)
 			{
+//				trace("MediatorMap.removeMediatorLater", view, view.stage);
 				if (!view.stage)
 					removeMediatorByView(view);
 				delete mediatorsMarkedForRemoval[view];

@@ -82,6 +82,7 @@
       <arg value="-default-background-color=0x000000"/>
 <!-- Include classes from SWCs in this folder, but only the ones we use. -->
       <arg value="-library-path+=${lib.loc}"/>
+	<arg value="-library-path+=libs"/>
 <!-- So true. -->
       <arg value="-incremental=true"/>
       <arg value="-verbose-stacktraces=true"/>
